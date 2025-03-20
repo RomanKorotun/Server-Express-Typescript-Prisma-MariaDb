@@ -1,8 +1,10 @@
 {
   "name": "server-express-typescript-prisma-mariadb",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
+    "start": "cross-env NODE_ENV=production node ./build/server",
+    "dev": "cross-env NODE_ENV=development nodemon ./build/server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -10,9 +12,11 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "nodemon": "^3.1.9",
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "cross-env": "^7.0.3",
     "express": "^4.21.2"
   }
 }
