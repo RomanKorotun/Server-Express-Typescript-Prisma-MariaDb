@@ -2,6 +2,7 @@
   "name": "server-express-typescript-prisma-mariadb",
   "version": "1.0.0",
   "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "cross-env NODE_ENV=production node ./build/server",
     "dev": "cross-env NODE_ENV=development nodemon ./build/server",
@@ -12,6 +13,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/express": "^5.0.1",
     "nodemon": "^3.1.9",
     "typescript": "^5.8.2"
   },
