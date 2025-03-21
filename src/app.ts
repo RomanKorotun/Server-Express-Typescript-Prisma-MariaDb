@@ -10,6 +10,7 @@ const { NODE_ENV } = process.env;
 const formatsLogger = NODE_ENV === "development" ? "dev" : "short";
 
 const app: Application = express();
+
 app.use(cors());
 app.use(logger(formatsLogger));
 app.use(express.json());

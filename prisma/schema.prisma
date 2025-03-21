@@ -18,6 +18,22 @@ model User {
   username String @db.VarChar(255)
   email String @db.VarChar(255) @unique
   password String @db.VarChar(100)
+  refreshTokens RefreshToken[]
   created_at DateTime @db.Timestamp() @default(now())
   updated_at DateTime @db.Timestamp() @updatedAt
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id Int @id @default(autoincrement())
+  token String @db.VarChar(512)
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  token_identifier String @db.VarChar(255)
+  created_at DateTime @db.Timestamp() @default(now())
+  updated_at DateTime @db.Timestamp() @updatedAt
+
+  @@unique([userId,token_identifier])
+  @@map("refresh_tokens")
 }
