@@ -1,6 +1,7 @@
 import express, { Application, NextFunction, Request, Response } from "express";
 import cors from "cors";
 import logger from "morgan";
+import cookieParser from "cookie-parser";
 import "dotenv/config";
 import { ICustomError } from "./interfaces/errorInterface.js";
 import { authRouter } from "./routes/api/index.js";
@@ -12,6 +13,7 @@ const formatsLogger = NODE_ENV === "development" ? "dev" : "short";
 const app: Application = express();
 
 app.use(cors());
+app.use(cookieParser());
 app.use(logger(formatsLogger));
 app.use(express.json());
 

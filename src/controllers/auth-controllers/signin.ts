@@ -6,7 +6,7 @@ import "dotenv/config";
 import {
   addRefreshToken,
   getUserByEmail,
-} from "../../services/user-services/index.js";
+} from "../../services/auth-services/index.js";
 import { HttpError } from "../../helpers/index.js";
 
 const {
@@ -38,11 +38,12 @@ const signin = async (req: Request, res: Response) => {
   if (!comparePassword) {
     throw HttpError(401, "Incorrect login or password");
   }
-  const tokenKey = nanoid();
-  const payload = { id: user.id, token_key: tokenKey };
+  const tokenIdentifier = nanoid();
+  const payload = { id: user.id, token_identifier: tokenIdentifier };
 
   const parsedAccessTime = parseInt(ACCESS_TOKEN_TIME);
   const parsedRefreshTime = parseInt(REFRESH_TOKEN_TIME);
+
   const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
     expiresIn: parsedAccessTime,
   });
@@ -53,7 +54,7 @@ const signin = async (req: Request, res: Response) => {
   await addRefreshToken({
     token: refreshToken,
     user: { connect: { id: user.id } },
-    token_identifier: tokenKey,
+    token_identifier: tokenIdentifier,
   });
 
   const isProduction = NODE_ENV === "production";

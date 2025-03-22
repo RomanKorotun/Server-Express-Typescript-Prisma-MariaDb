@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import bcryptjs from "bcryptjs";
 import { HttpError } from "../../helpers/index.js";
-import { addUser, getUserByEmail } from "../../services/user-services/index.js";
+import { addUser, getUserByEmail } from "../../services/auth-services/index.js";
 
 const signup = async (req: Request, res: Response) => {
   const { email, password } = req.body;
