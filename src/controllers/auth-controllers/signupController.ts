@@ -3,7 +3,7 @@ import bcryptjs from "bcryptjs";
 import { HttpError } from "../../helpers/index.js";
 import { addUser, getUserByEmail } from "../../services/auth-services/index.js";
 
-const signup = async (req: Request, res: Response) => {
+const signupController = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const user = await getUserByEmail(email);
   if (user) {
@@ -14,4 +14,4 @@ const signup = async (req: Request, res: Response) => {
   res.status(201).json(newUser);
 };
 
-export default signup;
+export default signupController;

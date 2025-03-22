@@ -18,9 +18,10 @@ model User {
   username String @db.VarChar(255)
   email String @db.VarChar(255) @unique
   password String @db.VarChar(100)
+  created_at DateTime @db.Timestamp(0) @default(now())
+  updated_at DateTime @db.Timestamp(0) @updatedAt
   refreshTokens RefreshToken[]
-  created_at DateTime @db.Timestamp() @default(now())
-  updated_at DateTime @db.Timestamp() @updatedAt
+  movies Movie[]
 
   @@map("users")
 }
@@ -31,9 +32,23 @@ model RefreshToken {
   userId Int
   user User @relation(fields: [userId], references: [id])
   token_identifier String @db.VarChar(255)
-  created_at DateTime @db.Timestamp() @default(now())
-  updated_at DateTime @db.Timestamp() @updatedAt
+  created_at DateTime @db.Timestamp(0) @default(now())
+  updated_at DateTime @db.Timestamp(0) @updatedAt
 
   @@unique([userId,token_identifier])
   @@map("refresh_tokens")
+}
+
+model Movie {
+  id Int @id @default(autoincrement())
+  poster String @db.VarChar(512)
+  name String @db.VarChar(255)
+  director String @db.VarChar(255)
+  releaseYear String @db.Char(4) @map("release_year")
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  created_at DateTime @db.Timestamp(0) @default(now())
+  updated_at DateTime @db.Timestamp(0) @updatedAt
+
+  @@map("movies")
 }

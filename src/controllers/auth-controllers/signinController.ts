@@ -7,49 +7,40 @@ import {
   addRefreshToken,
   getUserByEmail,
 } from "../../services/auth-services/index.js";
-import { HttpError } from "../../helpers/index.js";
+import { generateToken, HttpError } from "../../helpers/index.js";
 
-const {
-  NODE_ENV,
-  ACCESS_TOKEN_SECRET,
-  REFRESH_TOKEN_SECRET,
-  ACCESS_TOKEN_TIME,
-  REFRESH_TOKEN_TIME,
-} = process.env;
+const { NODE_ENV, ACCESS_TOKEN_TIME } = process.env;
 
-const signin = async (req: Request, res: Response) => {
-  if (
-    !ACCESS_TOKEN_SECRET ||
-    !REFRESH_TOKEN_SECRET ||
-    !ACCESS_TOKEN_TIME ||
-    !REFRESH_TOKEN_TIME
-  ) {
+const signinController = async (req: Request, res: Response) => {
+  if (!NODE_ENV || !ACCESS_TOKEN_TIME) {
     throw HttpError(
       500,
-      "Error: One or more required values are missing: ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_TIME, REFRESH_TOKEN_TIME"
+      "Error: One or more required values are missing: NODE_ENV, ACCESS_TOKEN_TIME"
     );
   }
+
   const { email, password } = req.body;
+
   const user = await getUserByEmail(email);
+
   if (!user) {
     throw HttpError(401, "Incorrect login or password");
   }
+
   const comparePassword = await bcryptjs.compare(password, user.password);
+
   if (!comparePassword) {
     throw HttpError(401, "Incorrect login or password");
   }
+
   const tokenIdentifier = nanoid();
+
   const payload = { id: user.id, token_identifier: tokenIdentifier };
 
   const parsedAccessTime = parseInt(ACCESS_TOKEN_TIME);
-  const parsedRefreshTime = parseInt(REFRESH_TOKEN_TIME);
 
-  const accessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
-    expiresIn: parsedAccessTime,
-  });
-  const refreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, {
-    expiresIn: parsedRefreshTime,
-  });
+  const accessToken = generateToken("access", payload);
+  const refreshToken = generateToken("refresh", payload);
 
   await addRefreshToken({
     token: refreshToken,
@@ -58,6 +49,7 @@ const signin = async (req: Request, res: Response) => {
   });
 
   const isProduction = NODE_ENV === "production";
+
   res.cookie("accessToken", accessToken, {
     httpOnly: true,
     secure: isProduction,
@@ -76,4 +68,4 @@ const signin = async (req: Request, res: Response) => {
   });
 };
 
-export default signin;
+export default signinController;

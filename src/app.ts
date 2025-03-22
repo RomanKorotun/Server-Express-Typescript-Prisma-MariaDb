@@ -4,7 +4,7 @@ import logger from "morgan";
 import cookieParser from "cookie-parser";
 import "dotenv/config";
 import { ICustomError } from "./interfaces/errorInterface.js";
-import { authRouter } from "./routes/api/index.js";
+import { authRouter, movieRouter } from "./routes/api/index.js";
 
 const { NODE_ENV } = process.env;
 
@@ -16,8 +16,10 @@ app.use(cors());
 app.use(cookieParser());
 app.use(logger(formatsLogger));
 app.use(express.json());
+app.use(express.static("public"));
 
 app.use("/api/auth", authRouter);
+app.use("/api/movies", movieRouter);
 
 app.use((req: Request, res: Response) => {
   res.status(404).json({ message: "Not Found" });

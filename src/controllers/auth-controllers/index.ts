@@ -1,5 +1,5 @@
-export { default as signup } from "./signup.js";
-export { default as signin } from "./signin.js";
-export { default as current } from "./current.js";
-export { default as refresh } from "./refresh.js";
-export { default as logout } from "./logout.js";
+export { default as signupController } from "./signupController.js";
+export { default as signinController } from "./signinController.js";
+export { default as currentController } from "./currentController.js";
+export { default as refreshController } from "./refreshController.js";
+export { default as logoutController } from "./logoutController.js";

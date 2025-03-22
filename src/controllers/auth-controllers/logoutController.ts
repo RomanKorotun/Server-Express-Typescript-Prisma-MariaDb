@@ -7,7 +7,7 @@ import { HttpError } from "../../helpers/index.js";
 
 const { NODE_ENV } = process.env;
 
-const logout = async (
+const logoutController = async (
   req: ICustomRequest,
   res: Response,
   next: NextFunction
@@ -50,4 +50,4 @@ const logout = async (
   }
 };
 
-export default logout;
+export default logoutController;

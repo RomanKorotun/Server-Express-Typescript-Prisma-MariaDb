@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { nanoid } from "nanoid";
-import { HttpError } from "../../helpers/index.js";
+import { generateToken, HttpError } from "../../helpers/index.js";
 import {
   addRefreshToken,
   deleteRefreshToken,
@@ -9,24 +9,17 @@ import {
   getUserById,
 } from "../../services/auth-services/index.js";
 
-const {
-  NODE_ENV,
-  ACCESS_TOKEN_SECRET,
-  REFRESH_TOKEN_SECRET,
-  ACCESS_TOKEN_TIME,
-  REFRESH_TOKEN_TIME,
-} = process.env;
+const { NODE_ENV, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_TIME } = process.env;
 
-const refresh = async (req: Request, res: Response, next: NextFunction) => {
-  if (
-    !ACCESS_TOKEN_SECRET ||
-    !REFRESH_TOKEN_SECRET ||
-    !ACCESS_TOKEN_TIME ||
-    !REFRESH_TOKEN_TIME
-  ) {
+const refreshController = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  if (!NODE_ENV || !REFRESH_TOKEN_SECRET || !ACCESS_TOKEN_TIME) {
     throw HttpError(
       500,
-      "Error: One or more required values are missing: ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_TIME, REFRESH_TOKEN_TIME"
+      "Error: One or more required values are missing: NODE_ENV, REFRESH_TOKEN_SECRET, ACCESS_TOKEN_TIME"
     );
   }
 
@@ -68,14 +61,9 @@ const refresh = async (req: Request, res: Response, next: NextFunction) => {
     };
 
     const parsedAccessTime = parseInt(ACCESS_TOKEN_TIME);
-    const parsedRefreshTime = parseInt(REFRESH_TOKEN_TIME);
 
-    const newAccessToken = jwt.sign(payload, ACCESS_TOKEN_SECRET, {
-      expiresIn: parsedAccessTime,
-    });
-    const newRefreshToken = jwt.sign(payload, REFRESH_TOKEN_SECRET, {
-      expiresIn: parsedRefreshTime,
-    });
+    const newAccessToken = generateToken("access", payload);
+    const newRefreshToken = generateToken("refresh", payload);
 
     await addRefreshToken({
       token: newRefreshToken,
@@ -84,6 +72,7 @@ const refresh = async (req: Request, res: Response, next: NextFunction) => {
     });
 
     const isProduction = NODE_ENV === "production";
+
     res.cookie("accessToken", newAccessToken, {
       httpOnly: true,
       secure: isProduction,
@@ -103,15 +92,19 @@ const refresh = async (req: Request, res: Response, next: NextFunction) => {
     });
   } catch (error: any) {
     const { id, token_identifier } = jwt.decode(token) as JwtPayload;
+
     const params = {
       where: { userId_token_identifier: { userId: id, token_identifier } },
     };
+
     const refreshToken = await getRefreshToken(params);
+
     if (refreshToken) {
       await deleteRefreshToken(params);
     }
+
     return next(HttpError(401, error.message));
   }
 };
 
-export default refresh;
+export default refreshController;
