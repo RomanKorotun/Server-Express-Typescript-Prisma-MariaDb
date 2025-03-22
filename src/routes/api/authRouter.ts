@@ -4,6 +4,7 @@ import { signinSchema, signupSchema } from "../../schemas/authSchema.js";
 import { ctrlWrapper, isValidBody } from "../../decorators/index.js";
 import {
   current,
+  logout,
   refresh,
   signin,
   signup,
@@ -28,5 +29,7 @@ authRouter.post(
 authRouter.get("/current", authentacate, ctrlWrapper(current));
 
 authRouter.get("/refresh", ctrlWrapper(refresh));
+
+authRouter.post("/logout", authentacate, ctrlWrapper(logout));
 
 export default authRouter;
